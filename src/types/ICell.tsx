@@ -1,8 +1,16 @@
-export type Pointer = 1 | -1
-export type Mark =  0 | Pointer
-export type Result = -2 | Mark
+import { Mark, Pointer } from "./DataTypes";
+
+
+export interface ICellStyled {
+    mark: Mark,
+    pointer:  Pointer,
+    size?: 'normal' | 'half'
+}
 
 export interface ICell {
     mark: Mark,
-    pointer:  Pointer
+    pointer:  Pointer,
+    index: number,
+    onClickHandler: (index:number) => void
+    loading: boolean
 }

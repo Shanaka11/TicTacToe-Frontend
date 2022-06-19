@@ -1,16 +1,17 @@
 import styled from "@emotion/styled";
 import * as vars from '../../styles/vars'
-import { ICell, Mark, Pointer } from "../../types/ICell";
+import { Mark, Pointer } from "../../types/DataTypes";
+import { ICell, ICellStyled } from "../../types/ICell";
 
 // If mark is either 1 or -1 show a solid mark
 // If its 0 then show a watered mark
-const getXMark = (color: 'black'|'lightgrey' = 'black') => {
+const getXMark = (color: 'black'|'lightgrey' = 'black', size:'normal' | 'half') => {
     return {
         cursor: color === 'black' && 'not-allowed',
         '&::after, &::before': {
             content: '""',
-            width: `calc(${vars.markSize} * .15)`,
-            height: vars.markSize,
+            width: `calc(${size==='normal' ? vars.markSize : vars.halfMarkSize} * .15)`,
+            height: size==='normal' ? vars.markSize : vars.halfMarkSize,
             backgroundColor: color,
             position: 'absolute'
         },
@@ -23,7 +24,7 @@ const getXMark = (color: 'black'|'lightgrey' = 'black') => {
     }
 }
 
-const getOMark = (color: 'black'|'lightgrey' = 'black') => {
+const getOMark = (color: 'black'|'lightgrey' = 'black', size:'normal' | 'half') => {
     return {
         cursor: color === 'black' && 'not-allowed',
         '&::after, &::before': {
@@ -32,60 +33,43 @@ const getOMark = (color: 'black'|'lightgrey' = 'black') => {
             borderRadius: '50%'
         },
         '&::before': {
-            width: vars.markSize,
-            height: vars.markSize,
+            width: size==='normal' ? vars.markSize : vars.halfMarkSize,
+            height: size==='normal' ? vars.markSize : vars.halfMarkSize,
             backgroundColor: color,
         },
         '&::after': {
-            width: `calc(${vars.markSize} * .7)`,
-            height: `calc(${vars.markSize} * .7)`,
+            width: `calc(${size==='normal' ? vars.markSize : vars.halfMarkSize} * .7)`,
+            height: `calc(${size==='normal' ? vars.markSize : vars.halfMarkSize} * .7)`,
             backgroundColor: 'white',
         }
     }
 }
 
-const getMarkStyle = (mark:Mark, pointer:Pointer) => {
-    if(mark === 1) return getXMark()
-    if(mark === -1) return getOMark()
+const getMarkStyle = (mark:Mark, pointer:Pointer, size:'normal' | 'half') => {
+    if(mark === 1) return getXMark('black', size)
+    if(mark === -1) return getOMark('black', size)
     if(pointer === 1) return {
-        '&:hover' : getXMark("lightgrey")
+        '&:hover' : getXMark("lightgrey", size)
     }
     return {
-        '&:hover' : getOMark("lightgrey")
+        '&:hover' : getOMark("lightgrey", size)
     }
 
 }
 
-const markStyle = {
-    1 : {
-        
+const cellSize = {
+    'half': {
+        width: vars.halfBase,
+        height: vars.halfBase
     },
-
-    "-1" : {
-        
-    },
-    0 : {
-        '&:hover': {
-            '&::after, &::before': {
-                content: '""',
-                width: `calc(${vars.markSize} * .15)`,
-                height: vars.markSize,
-                backgroundColor: 'lightGrey',
-                position: 'absolute'
-            },
-            '&::before': {
-                transform: 'rotate(45deg)'
-            },
-            '&::after': {
-                transform: 'rotate(-45deg)'
-            }
-        }
+    'normal': {
+        width: vars.base,
+        height: vars.base
     }
-
 }
 
 //@ts-ignore
-export const StyledCell = styled.div<ICell>({
+export const StyledCell = styled.div<ICellStyled>({
     width: vars.base,
     height: vars.base,
     border: '1px solid black', 
@@ -110,6 +94,9 @@ export const StyledCell = styled.div<ICell>({
         borderBottom: 'none'
     }
 },
-({mark, pointer}) => {
-        return getMarkStyle(mark, pointer)
+({mark, pointer, size='normal'}) => {
+        return getMarkStyle(mark, pointer, size)
+},
+({size = 'normal'}) => {
+    return cellSize[size]
 })
